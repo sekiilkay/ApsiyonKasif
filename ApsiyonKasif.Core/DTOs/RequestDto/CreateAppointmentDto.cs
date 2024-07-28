@@ -9,6 +9,6 @@ namespace ApsiyonKasif.Core.DTOs.RequestDto
     public record CreateAppointmentDto
     {
         public string Date { get; set; }
-        public string Hours { get; set; }
+        public string Hour { get; set; }
     }
 }

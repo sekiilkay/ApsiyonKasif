@@ -74,10 +74,10 @@ namespace ApsiyonKasif.Repository.Repositories
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
-            if (DateOnly.TryParse(appointmentDto.Date, out DateOnly parsedDate) && TimeOnly.TryParse(appointmentDto.Hours, out TimeOnly parsedTime))
+            if (DateOnly.TryParse(appointmentDto.Date, out DateOnly parsedDate) && TimeOnly.TryParse(appointmentDto.Hour, out TimeOnly parsedTime))
             {
                 TimeSpan timeSpan = parsedTime.ToTimeSpan();
-
+                
                 var appointment = await _context.Appointments
                     .FirstOrDefaultAsync(x => x.Date == parsedDate && x.Hours == timeSpan);
 
@@ -103,7 +103,8 @@ namespace ApsiyonKasif.Repository.Repositories
 
                 return appointments.Select(x => new AppointmentListDto
                 {
-                    Hours = x.Hours
+                    Text = x.Hours.ToString(@"hh\:mm"),
+                    Value = x.Hours.ToString(@"hh\:mm")
                 }).ToList();
             }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ApsiyonKasif.Core.DTOs.RequestDto
 {
-    public record AppointmentListDto
+    public class AppointmentInfoDto
     {
         public string Text { get; set; }
         public string Value { get; set; }

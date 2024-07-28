@@ -132,7 +132,10 @@ namespace ApsiyonKasif.Repository.Repositories
 
         public async Task<AdvertDetailDto> GetAdvertDetails(int advertId)
         {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier)!.Value;
+
             var advert = await _context.Adverts
+                .Include(x => x.Appointments)
                 .Include(x => x.AdvertType)
                 .Include(x => x.Home)
                     .ThenInclude(x => x.Apartment)
@@ -238,8 +241,21 @@ namespace ApsiyonKasif.Repository.Repositories
             {
                 Name = advert.Home.Owner?.AppUser?.Name!,
                 Number = advert.Home.Owner?.AppUser?.PhoneNumber!,
-                Image = advert.Home.Owner?.AppUser?.ImageUrl!
+                Image = advert.Home.Owner?.AppUser?.ImageUrl!,
+                IsOwner = advert.Home.Owner?.AppUserId == userId
             };
+
+            var firstAppointment = advert.Appointments.FirstOrDefault();
+
+            var appointments = advert.Appointments
+            .GroupBy(appointment => appointment.Date)
+            .Select(group => new AppointmentInfoDto
+            {
+                Text = group.Key.ToString("yyyy-MM-dd"),
+                Value = group.Key.ToString("yyyy-MM-dd")
+            })
+            .ToList();
+
 
             var homeImages = advert.Home.HomeImages?.Select(img => img.Url).ToList() ?? new List<string>();
             var advertDetail = new AdvertDetailDto
@@ -253,6 +269,7 @@ namespace ApsiyonKasif.Repository.Repositories
                 Images = homeImages,
                 Services = siteServices,
                 TourUrl = tourUrl,
+                Appointments = appointments
             };
 
             return advertDetail;

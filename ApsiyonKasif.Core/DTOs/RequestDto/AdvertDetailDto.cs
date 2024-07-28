@@ -14,6 +14,7 @@ namespace ApsiyonKasif.Core.DTOs.RequestDto
         public BillingInfoDto Billing { get; set; }
         public RentalHistoryDto History { get; set; }
         public OwnerContactInfoDto Owner { get; set; }
+        public List<AppointmentInfoDto> Appointments { get; set; }
         public List<ServiceDto> Services { get; set; }
         public TourUrlDto TourUrl { get; set; }
         public List<string> Images { get; set; } 
