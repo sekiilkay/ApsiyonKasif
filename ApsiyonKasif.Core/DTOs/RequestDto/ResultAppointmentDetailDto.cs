@@ -9,6 +9,7 @@ namespace ApsiyonKasif.Core.DTOs.RequestDto
 {
     public record ResultAppointmentDetailDto
     {
+        public int? Id { get; set; }
         public DateOnly Date { get; set; }
         public TimeSpan Hours { get; set; }
         public string FullName { get; set; }

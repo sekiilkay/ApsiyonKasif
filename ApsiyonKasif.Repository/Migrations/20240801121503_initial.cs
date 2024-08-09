@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApsiyonKasif.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDbs : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,6 +49,7 @@ namespace ApsiyonKasif.Repository.Migrations
                     MotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FatherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -75,9 +76,7 @@ namespace ApsiyonKasif.Repository.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Longitude = table.Column<decimal>(type: "decimal(8,6)", nullable: false),
-                    Latitude = table.Column<decimal>(type: "decimal(8,6)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,6 +133,19 @@ namespace ApsiyonKasif.Repository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RoomCount", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Services",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Services", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -263,6 +275,32 @@ namespace ApsiyonKasif.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BuildingComplexServices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BuildingComplexId = table.Column<int>(type: "int", nullable: false),
+                    ServiceId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BuildingComplexServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BuildingComplexServices_BuildingComplexes_BuildingComplexId",
+                        column: x => x.BuildingComplexId,
+                        principalTable: "BuildingComplexes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BuildingComplexServices_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Districts",
                 columns: table => new
                 {
@@ -288,6 +326,13 @@ namespace ApsiyonKasif.Repository.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConnectedBlock = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    Dues = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NumberOfFloor = table.Column<int>(type: "int", nullable: false),
+                    HasElevator = table.Column<bool>(type: "bit", nullable: false),
+                    HasGarage = table.Column<bool>(type: "bit", nullable: false),
                     DistrictId = table.Column<int>(type: "int", nullable: false),
                     BuildingComplexId = table.Column<int>(type: "int", nullable: true),
                     HeatingTypeId = table.Column<int>(type: "int", nullable: false)
@@ -315,34 +360,25 @@ namespace ApsiyonKasif.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApartmentProperties",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApartmentId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApartmentProperties", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ApartmentProperties_Apartments_ApartmentId",
-                        column: x => x.ApartmentId,
-                        principalTable: "Apartments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Homes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoomCountId = table.Column<int>(type: "int", nullable: false),
-                    ApartmentId = table.Column<int>(type: "int", nullable: true)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DoorNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GrossArea = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NetArea = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Floor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Direction = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HasBalcony = table.Column<bool>(type: "bit", nullable: false),
+                    HasFurnished = table.Column<bool>(type: "bit", nullable: false),
+                    BathromCount = table.Column<int>(type: "int", nullable: false),
+                    TourUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(8,6)", nullable: false),
+                    Latitude = table.Column<decimal>(type: "decimal(8,6)", nullable: false),
+                    ApartmentId = table.Column<int>(type: "int", nullable: false),
+                    RoomCountId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -351,7 +387,8 @@ namespace ApsiyonKasif.Repository.Migrations
                         name: "FK_Homes_Apartments_ApartmentId",
                         column: x => x.ApartmentId,
                         principalTable: "Apartments",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Homes_RoomCount_RoomCountId",
                         column: x => x.RoomCountId,
@@ -367,12 +404,10 @@ namespace ApsiyonKasif.Repository.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AdvertTypeId = table.Column<int>(type: "int", nullable: false),
-                    HomeId = table.Column<int>(type: "int", nullable: false),
-                    ApartmentId = table.Column<int>(type: "int", nullable: false)
+                    HomeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -381,12 +416,6 @@ namespace ApsiyonKasif.Repository.Migrations
                         name: "FK_Adverts_AdvertTypes_AdvertTypeId",
                         column: x => x.AdvertTypeId,
                         principalTable: "AdvertTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Adverts_Apartments_ApartmentId",
-                        column: x => x.ApartmentId,
-                        principalTable: "Apartments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -418,33 +447,13 @@ namespace ApsiyonKasif.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HomeProperties",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HomeId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HomeProperties", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HomeProperties_Homes_HomeId",
-                        column: x => x.HomeId,
-                        principalTable: "Homes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Invoices",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Icon = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     InvoiceTypeId = table.Column<int>(type: "int", nullable: false),
                     HomeId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -501,8 +510,8 @@ namespace ApsiyonKasif.Repository.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
-                    HomeId = table.Column<int>(type: "int", nullable: false),
                     IsOccupied = table.Column<bool>(type: "bit", nullable: false),
+                    HomeId = table.Column<int>(type: "int", nullable: false),
                     AppUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -528,9 +537,10 @@ namespace ApsiyonKasif.Repository.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Hours = table.Column<TimeSpan>(type: "time", nullable: false),
                     IsScheduled = table.Column<bool>(type: "bit", nullable: false),
+                    AppUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AdvertId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -542,6 +552,11 @@ namespace ApsiyonKasif.Repository.Migrations
                         principalTable: "Adverts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Appointments_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -550,20 +565,10 @@ namespace ApsiyonKasif.Repository.Migrations
                 column: "AdvertTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Adverts_ApartmentId",
-                table: "Adverts",
-                column: "ApartmentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Adverts_HomeId",
                 table: "Adverts",
                 column: "HomeId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ApartmentProperties_ApartmentId",
-                table: "ApartmentProperties",
-                column: "ApartmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Apartments_BuildingComplexId",
@@ -584,6 +589,11 @@ namespace ApsiyonKasif.Repository.Migrations
                 name: "IX_Appointments_AdvertId",
                 table: "Appointments",
                 column: "AdvertId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_AppUserId",
+                table: "Appointments",
+                column: "AppUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -625,6 +635,16 @@ namespace ApsiyonKasif.Repository.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BuildingComplexServices_BuildingComplexId",
+                table: "BuildingComplexServices",
+                column: "BuildingComplexId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BuildingComplexServices_ServiceId",
+                table: "BuildingComplexServices",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Counties_CityId",
                 table: "Counties",
                 column: "CityId");
@@ -637,11 +657,6 @@ namespace ApsiyonKasif.Repository.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_HomeImages_HomeId",
                 table: "HomeImages",
-                column: "HomeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_HomeProperties_HomeId",
-                table: "HomeProperties",
                 column: "HomeId");
 
             migrationBuilder.CreateIndex(
@@ -690,9 +705,6 @@ namespace ApsiyonKasif.Repository.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApartmentProperties");
-
-            migrationBuilder.DropTable(
                 name: "Appointments");
 
             migrationBuilder.DropTable(
@@ -711,10 +723,10 @@ namespace ApsiyonKasif.Repository.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "HomeImages");
+                name: "BuildingComplexServices");
 
             migrationBuilder.DropTable(
-                name: "HomeProperties");
+                name: "HomeImages");
 
             migrationBuilder.DropTable(
                 name: "Invoices");
@@ -730,6 +742,9 @@ namespace ApsiyonKasif.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "InvoiceTypes");

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApsiyonKasif.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240727164539_TryCreateDb4")]
-    partial class TryCreateDb4
+    [Migration("20240801121503_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace ApsiyonKasif.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AdvertTypeId")
+                    b.Property<int>("AdvertTypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
@@ -223,7 +223,6 @@ namespace ApsiyonKasif.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AppUserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateOnly>("Date")
@@ -259,6 +258,29 @@ namespace ApsiyonKasif.Repository.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BuildingComplexes");
+                });
+
+            modelBuilder.Entity("ApsiyonKasif.Core.Entities.BuildingComplexService", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BuildingComplexId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuildingComplexId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("BuildingComplexServices");
                 });
 
             modelBuilder.Entity("ApsiyonKasif.Core.Entities.City", b =>
@@ -392,6 +414,9 @@ namespace ApsiyonKasif.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TourUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
@@ -436,6 +461,10 @@ namespace ApsiyonKasif.Repository.Migrations
 
                     b.Property<int>("HomeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("InvoiceTypeId")
                         .HasColumnType("int");
@@ -506,6 +535,23 @@ namespace ApsiyonKasif.Repository.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RoomCount");
+                });
+
+            modelBuilder.Entity("ApsiyonKasif.Core.Entities.Service", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("ApsiyonKasif.Core.Entities.Tenant", b =>
@@ -682,15 +728,19 @@ namespace ApsiyonKasif.Repository.Migrations
 
             modelBuilder.Entity("ApsiyonKasif.Core.Entities.Advert", b =>
                 {
-                    b.HasOne("ApsiyonKasif.Core.Entities.AdvertType", null)
+                    b.HasOne("ApsiyonKasif.Core.Entities.AdvertType", "AdvertType")
                         .WithMany("Adverts")
-                        .HasForeignKey("AdvertTypeId");
+                        .HasForeignKey("AdvertTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ApsiyonKasif.Core.Entities.Home", "Home")
                         .WithOne("Advert")
                         .HasForeignKey("ApsiyonKasif.Core.Entities.Advert", "HomeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AdvertType");
 
                     b.Navigation("Home");
                 });
@@ -730,13 +780,30 @@ namespace ApsiyonKasif.Repository.Migrations
 
                     b.HasOne("ApsiyonKasif.Core.Entities.AppUser", "AppUser")
                         .WithMany("Appointments")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AppUserId");
 
                     b.Navigation("Advert");
 
                     b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("ApsiyonKasif.Core.Entities.BuildingComplexService", b =>
+                {
+                    b.HasOne("ApsiyonKasif.Core.Entities.BuildingComplex", "BuildingComplex")
+                        .WithMany("BuildingComplexServices")
+                        .HasForeignKey("BuildingComplexId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApsiyonKasif.Core.Entities.Service", "Service")
+                        .WithMany("BuildingComplexServices")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BuildingComplex");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("ApsiyonKasif.Core.Entities.County", b =>
@@ -922,6 +989,8 @@ namespace ApsiyonKasif.Repository.Migrations
             modelBuilder.Entity("ApsiyonKasif.Core.Entities.BuildingComplex", b =>
                 {
                     b.Navigation("Apartment");
+
+                    b.Navigation("BuildingComplexServices");
                 });
 
             modelBuilder.Entity("ApsiyonKasif.Core.Entities.City", b =>
@@ -967,6 +1036,11 @@ namespace ApsiyonKasif.Repository.Migrations
             modelBuilder.Entity("ApsiyonKasif.Core.Entities.RoomCount", b =>
                 {
                     b.Navigation("Homes");
+                });
+
+            modelBuilder.Entity("ApsiyonKasif.Core.Entities.Service", b =>
+                {
+                    b.Navigation("BuildingComplexServices");
                 });
 #pragma warning restore 612, 618
         }

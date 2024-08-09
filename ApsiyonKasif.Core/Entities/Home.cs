@@ -20,6 +20,7 @@ namespace ApsiyonKasif.Core.Entities
         public bool HasBalcony { get; set; }
         public bool HasFurnished { get; set; }
         public int BathromCount { get; set; }
+        public string? TourUrl { get; set; }
 
         [Column(TypeName = "decimal(8,6)")]
         public decimal Longitude { get; set; }

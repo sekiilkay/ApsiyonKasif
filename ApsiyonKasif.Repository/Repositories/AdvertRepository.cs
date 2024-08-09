@@ -113,7 +113,7 @@ namespace ApsiyonKasif.Repository.Repositories
             var roomCount = home.RoomCount?.Name;
             var advertTypeName = advertType?.Name;
 
-            var titleName = home.Apartment.BuildingComplex?.Name ?? home.Apartment.Name;
+            var titleName = home.Apartment.District?.Name + " Mahallesi";
 
             var createAdvert = new Advert
             {
@@ -121,13 +121,43 @@ namespace ApsiyonKasif.Repository.Repositories
                 Price = create.Price,
                 CreatedDate = DateTime.Now,
                 HomeId = create.HomeId,
-                Title = $"{titleName} {home.Apartment.ConnectedBlock} {home.Floor}.Kat Daire {home.DoorNumber}"
+                Title = $"{titleName} {home.Floor}.Kat Daire {home.DoorNumber}"
             };
+
 
             await _context.Adverts.AddAsync(createAdvert);
             await _context.SaveChangesAsync();
 
+            var advertId = createAdvert.Id;
+            var date = DateOnly.FromDateTime(DateTime.Now); 
+            var hours = new[] { "10:00", "11:00", "12:00", "13:00" };
+
+            foreach (var hour in hours)
+            {
+                var appointmentDto = new CreateAppointmentDto
+                {
+                    Date = date.ToString(),
+                    Hour = hour,
+                    AdvertId = advertId
+                };
+
+                await CreateAppointment(appointmentDto);
+            }
+
             return createAdvert;
+        }
+
+        public async Task CreateAppointment(CreateAppointmentDto createAppointmentDto)
+        {
+            var appointment = new Appointment
+            {
+                Date = DateOnly.Parse(createAppointmentDto.Date),
+                Hours = TimeSpan.Parse(createAppointmentDto.Hour),
+                AdvertId = createAppointmentDto.AdvertId.Value
+            };
+
+            await _context.Appointments.AddAsync(appointment);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<AdvertDetailDto> GetAdvertDetails(int advertId)
@@ -172,11 +202,11 @@ namespace ApsiyonKasif.Repository.Repositories
 
             var netArea = advert.Home.NetArea;
 
-            var titleName = advert.Home.Apartment.BuildingComplex?.Name ?? advert.Home.Apartment.Name;
+            var titleName = advert.Home.Apartment.District?.Name + " Mahallesi";
 
             var advertTitle = new AdvertTitleDto
             {
-                Title = titleName,
+                Title = $"{titleName} {advert.Home.Apartment.BuildingComplex.Name} {advert.Home.Apartment.ConnectedBlock} {advert.Home.Floor}.Kat Daire {advert.Home.DoorNumber}",
                 Price = advertItem.Price,
                 CityName = advertItem.Home.Apartment.District.County.City.Name,
                 CountyName = advertItem.Home.Apartment.District.County.Name
@@ -228,7 +258,7 @@ namespace ApsiyonKasif.Repository.Repositories
 
             var tourUrl = new TourUrlDto
             {
-                Url = advertItem.TourUrl
+                Url = advert.Home.TourUrl
             };
 
             var siteServices = advert.Home.Apartment.BuildingComplex?.BuildingComplexServices

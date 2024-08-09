@@ -13,11 +13,7 @@ namespace ApsiyonKasif.Core.Entities
         public int Id { get; set; }
         public string Title { get; set; }
         public decimal Price { get; set; }
-
-        [JsonIgnore]
-        public string? TourUrl { get; set; }
         public DateTime CreatedDate { get; set; }
-
         public int AdvertTypeId { get; set; }
 
         [JsonIgnore]

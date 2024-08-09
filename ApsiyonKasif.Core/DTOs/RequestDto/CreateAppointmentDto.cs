@@ -10,5 +10,6 @@ namespace ApsiyonKasif.Core.DTOs.RequestDto
     {
         public string Date { get; set; }
         public string Hour { get; set; }
+        public int? AdvertId { get; set; }
     }
 }

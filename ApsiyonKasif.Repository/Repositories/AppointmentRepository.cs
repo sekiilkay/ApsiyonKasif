@@ -48,6 +48,7 @@ namespace ApsiyonKasif.Repository.Repositories
                     .Include(x => x.AppUser)
                     .ToListAsync();
 
+
                 var result = new ResultAdvertAppointmentDto
                 {
                     Id = item.Id,
@@ -58,6 +59,7 @@ namespace ApsiyonKasif.Repository.Repositories
                     ImageUrl = item.Home.HomeImages.FirstOrDefault()!.Url,
                     AppointmentList = appointments.Select(appointment => new ResultAppointmentDetailDto
                     {
+                        Id = appointment.Id,
                         Date = appointment.Date, 
                         FullName = appointment.AppUser.Name!,
                         Hours = appointment.Hours
@@ -77,18 +79,33 @@ namespace ApsiyonKasif.Repository.Repositories
             if (DateOnly.TryParse(appointmentDto.Date, out DateOnly parsedDate) && TimeOnly.TryParse(appointmentDto.Hour, out TimeOnly parsedTime))
             {
                 TimeSpan timeSpan = parsedTime.ToTimeSpan();
-                
-                var appointment = await _context.Appointments
+
+                var existingAppointment = await _context.Appointments
                     .FirstOrDefaultAsync(x => x.Date == parsedDate && x.Hours == timeSpan);
 
-                if (appointment != null)
+                // Aynı saat ve tarihte randevu mevcut mu?
+
+                if (existingAppointment != null)
                 {
-                    if (!appointment.IsScheduled)
+                    if (!existingAppointment.IsScheduled)
                     {
-                        appointment.IsScheduled = true;
-                        appointment.AppUserId = userId;
+                        existingAppointment.IsScheduled = true;
+                        existingAppointment.AppUserId = userId;
                         await _context.SaveChangesAsync();
                     }
+                }
+                else
+                {
+                    var newAppointment = new Appointment
+                    {
+                        Date = parsedDate,
+                        Hours = timeSpan,
+                        IsScheduled = true,
+                        AppUserId = userId
+                    };
+
+                    _context.Appointments.Add(newAppointment);
+                    await _context.SaveChangesAsync();
                 }
             }
         }

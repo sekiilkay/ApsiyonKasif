@@ -46,9 +46,6 @@ namespace ApsiyonKasif.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TourUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AdvertTypeId");
@@ -412,6 +409,9 @@ namespace ApsiyonKasif.Repository.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TourUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
